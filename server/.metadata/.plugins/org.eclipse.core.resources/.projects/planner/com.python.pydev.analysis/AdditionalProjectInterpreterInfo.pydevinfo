@@ -1,0 +1,22 @@
+-- VERSION_4
+-- START DISKCACHE
+/Users/chhe/Documents/MyProject/planner-backend/server/.metadata/.plugins/org.eclipse.core.resources/.projects/planner/com.python.pydev.analysis/v2_indexcache
+app.views|1395519145000|/Users/chhe/Documents/MyProject/planner-backend/server/planner/app/views.py
+app.run|1395518973000|/Users/chhe/Documents/MyProject/planner-backend/server/planner/app/run.py
+app.__init__|1395518917000|/Users/chhe/Documents/MyProject/planner-backend/server/planner/app/__init__.py
+-- END DISKCACHE
+-- START DICTIONARY
+2
+2=app.views
+1=app.__init__
+-- END DICTIONARY
+-- START TREE 1
+4
+app|1|app!11@
+ind|1|index!18@
+rea|1|readRedis!18@
+red|0|
+-- END TREE
+-- START TREE 2
+0
+-- END TREE

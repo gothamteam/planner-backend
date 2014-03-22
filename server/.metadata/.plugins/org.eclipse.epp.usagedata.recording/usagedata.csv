@@ -1,0 +1,26 @@
+what,kind,bundleId,bundleVersion,description,time
+startIde,ide,Unknown,,"[IDE] RIDE-3.0.1",1395518622813
+started,bundle,com.ebay.tools.dede,1.12.1.201209041901,"com.ebay.tools.dede",1395518622819
+started,bundle,com.ebay.tools.dede.ui,1.12.1.201209041901,"com.ebay.tools.dede.ui",1395518622819
+started,bundle,com.ebay.tools.ede.themis,1.0.0.201203151301,"com.ebay.tools.ede.themis",1395518622819
+started,bundle,com.ebay.tools.raptor.app.metadata,3.0.1.201312050845,"com.ebay.tools.raptor.app.metadata",1395518622819
+started,bundle,com.ebay.tools.raptor.common,3.0.1.201312050845,"com.ebay.tools.raptor.common",1395518622820
+started,bundle,com.ebay.tools.raptor.git,3.0.1.201312050845,"com.ebay.tools.raptor.git",1395518622820
+started,bundle,com.ebay.tools.raptor.m2project.upgrade,3.0.1.201312050845,"com.ebay.tools.raptor.m2project.upgrade",1395518622820
+started,bundle,com.ebay.tools.raptor.maven,3.0.1.201312050845,"com.ebay.tools.raptor.maven",1395518622820
+started,bundle,com.ebay.tools.raptor.maven.build,3.0.1.201312050845,"com.ebay.tools.raptor.maven.build",1395518622821
+started,bundle,com.ebay.tools.raptor.maven.resources,3.0.1.201312050845,"com.ebay.tools.raptor.maven.resources",1395518622821
+started,bundle,com.ebay.tools.raptor.notification.core,3.0.1.201312050845,"com.ebay.tools.raptor.notification.core",1395518622821
+started,bundle,com.ebay.tools.ssdfinder,3.0.1.201312050845,"com.ebay.tools.ssdfinder",1395518622821
+started,bundle,com.ebay.tools.tracking,3.0.1.201312050845,"com.ebay.tools.tracking",1395518622821
+started,bundle,com.ebay.uede.adoptiontracking,1.3.1.R201210161858,"com.ebay.uede.adoptiontracking",1395518622822
+started,bundle,com.ebay.tools.raptor.common.e4,3.0.1.201312050845,"com.ebay.tools.raptor.common.e4",1395518623014
+started,bundle,com.ebay.tools.raptor.notification,3.0.1.201312050845,"com.ebay.tools.raptor.notification",1395518623025
+started,bundle,com.ebay.tools.raptor.projectvalidation,3.0.1.201312050845,"com.ebay.tools.raptor.projectvalidation",1395518623028
+started,bundle,com.ebay.tools.raptor.projectvalidation.core,3.0.1.201312050845,"com.ebay.tools.raptor.projectvalidation.core",1395518623035
+started,bundle,com.ebay.tools.raptor.projectvalidation.health,3.0.1.201312050845,"com.ebay.tools.raptor.projectvalidation.health",1395518623133
+started,bundle,com.ebay.tools.raptor.server.geronimo,3.0.1.201312050845,"com.ebay.tools.raptor.server.geronimo",1395518623137
+started,bundle,com.ebay.tools.raptor.server.core,3.0.1.201312050845,"com.ebay.tools.raptor.server.core",1395518623143
+started,bundle,com.ebay.tools.soa.external,2.10.0.201312091210,"com.ebay.tools.soa.external",1395518625569
+started,bundle,com.ebay.tools.tracking.ride,3.0.1.201312050845,"com.ebay.tools.tracking.ride",1395518625570
+started,bundle,com.ebay.tools.raptor.m2e.logging.impl,3.0.1.201312050845,"com.ebay.tools.raptor.m2e.logging.impl",1395518712359
