@@ -1,0 +1,13 @@
+'''
+Created on Mar 22, 2014
+
+@author: chhe
+'''
+from app import app
+
+@app.route('/')
+@app.route('/index')
+def index():
+    return "Hello, World!"
+
+@app.route("/clouds.json")

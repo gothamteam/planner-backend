@@ -1,1 +1,4 @@
 MODULES_MANAGER_V2
+__init__|/Users/chhe/Documents/MyProject/planner-backend/server/planner/app/__init__.py
+run|/Users/chhe/Documents/MyProject/planner-backend/server/planner/app/run.py
+views|/Users/chhe/Documents/MyProject/planner-backend/server/planner/app/views.py
