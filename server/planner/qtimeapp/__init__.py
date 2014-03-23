@@ -13,3 +13,6 @@ app.redis = redis.StrictRedis(host=os.getenv('WERCKER_REDIS_HOST', 'localhost'),
 
 from qtimeapp import views
 from qtimeapp import redisAPIViews
+
+if __name__ == "__main__":
+    app.run()
