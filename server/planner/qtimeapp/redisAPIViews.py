@@ -9,7 +9,7 @@ import redis
 from flask import Flask
 from flask import Response
 from flask import json
-from app import app
+from qtimeapp import app
 
 
 @app.route("/resturants/random")

@@ -11,5 +11,5 @@ app = Flask(__name__)
 app.redis = redis.StrictRedis(host=os.getenv('WERCKER_REDIS_HOST', 'localhost'),
       port= 6379, db=0)
 
-from app import views
-from app import redisAPIViews
+from qtimeapp import views
+from qtimeapp import redisAPIViews
