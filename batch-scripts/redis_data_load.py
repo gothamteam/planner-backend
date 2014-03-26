@@ -55,14 +55,38 @@ def import_restaurant_data(args):
                   print '%d items has been inserted' % count
 
 
+def print_unique_addresses(args):
+     datafile = args.data
+     uniq_set = set()
+     with open(datafile, 'r') as f:
+         count = 0
+         for line in f:
+             count += 1
+             if count == 1:
+                 continue
+             info =  parse_restaurant_info(line)
+             json_obj = json.dumps(info, ensure_ascii=False)
+             key = 'rest:%s:%s' % (info['strt'], info['zipcode'])
+             signature = '%s:%s:%s' % (info['name'], info['addr'], info['zipcode'])
+             # print count
+             # print json_obj
+             if signature not in uniq_set:
+                  uniq_set.add(signature)
+                  print info['addr'] + ', ' + info['zipcode']
+             
+
 def main():
      parser = argparse.ArgumentParser()
      parser.add_argument('--data', type=str, required=True)
      parser.add_argument('--host', type=str, required=True)
      parser.add_argument('--port', type=int, default=6379)
+     parser.add_argument('--run', type=str, choices=['import', 'print'], required=True)
 
      args = parser.parse_args()
-     import_restaurant_data(args)
+     if args.run == 'import':
+          import_restaurant_data(args)
+     elif args.run == 'print':
+          print_unique_addresses(args)
 
 if __name__ == '__main__':
      main()
