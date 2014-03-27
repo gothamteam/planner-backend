@@ -2,18 +2,18 @@ import sys
 import time
 import requests
 from bs4 import BeautifulSoup
+import argparse
+import signal
 
 BING_MAPS_KEY = 'Ahy8gRlSXY-6ByIWtjmeL6wXWYO6m8WIYazn2J-n33r8lNgaQ-kABeQisHzAyFwm'
 BING_MAPS_NY_URL = 'http://dev.virtualearth.net/REST/v1/Locations/US/NY/%d//%s?o=xml&key=' + BING_MAPS_KEY
-
 GOOGLE_MAPS_URL = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false'
 
-proxies = [
-    'http://94.228.205.33:8080',
-    'http://194.255.66.56:8080',
-    'http://109.99.168.174:8080',
-    'http://195.175.200.166:8080'
-]
+def handler(signum, frame):
+    raise Exception("Time out")
+
+class OverLimitException(Exception):
+    pass
 
 def geo_encoding_bing(address, zipcode):
     url = BING_MAPS_NY_URL % (zipcode, address)
@@ -32,40 +32,70 @@ def geo_encoding_bing(address, zipcode):
 
 def geo_encoding_google(address, zipcode, proxy):
     url = GOOGLE_MAPS_URL % ('+'.join(address.split()) + 'NY,+' + str(zipcode))
-    r = requests.get(url, proxies = proxy)
+    signal.alarm(10)
+    r = requests.get(url, proxies = proxy, timeout = 10)
+    signal.alarm(0)
     if r.ok:
-        try:
+        json_data = r.json()
+        if json_data['status'] == 'OK':
             json_data = r.json()
             location = json_data['results'][0]['geometry']['location']
             return location['lat'], location['lng']
-        except:
+        elif json_data['status'] == 'OVER_QUERY_LIMIT':
+            raise OverLimitException(r.text)
+        else:
             raise Exception(r.text)
     else:
         raise Exception(r.text)
 
 
-def main():
-    input_file = sys.argv[1]
-    output_file = sys.argv[2]
+def run_geo_encoding_job(args):
+    input_file = args.input
+    output_file = args.output
+    proxy_file = args.proxy
+    start = args.start
+
+    proxies = []
+    if proxy_file is not None:
+        with open(proxy_file) as fin:
+            proxies = [{'https': line.strip()} for line in fin.readlines()]
 
     count = 0
     fout = open(output_file, 'w')
     with open(input_file, 'r') as fin:
         for line in fin:
             count += 1
+            if count < start:
+                continue
             address, zipcode = line.split(',')
             try:
-                proxy = { 'https': proxies[count % len(proxies)] }
+                proxy = proxies[count % len(proxies)]
                 print proxy
                 x, y = geo_encoding_google(address, int(zipcode), proxy)                
                 fout.write("%s: (%f, %f)\n" % (line.strip(), x, y))
                 if count % 10 == 0:
                     print "%d addresses have been processed" % count
+            except OverLimitException as e:
+                print '%s over limit' % proxy
+                del proxies[count % len(proxies)]
+                if len(proxies) == 0:
+                    break
             except Exception as e:
                 print proxy
                 print "%s: %s" % (line, e.args[0])
+    print count
     fout.close()
 
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', type=str, required=True)
+    parser.add_argument('--output', type=str, required=True)
+    parser.add_argument('--proxy', type=str, required=False)
+    parser.add_argument('--start', type=int, default=-1)
+    args = parser.parse_args()
+    signal.signal(signal.SIGALRM, handler)
+    run_geo_encoding_job(args)
 
 if __name__ == '__main__':
     main()
