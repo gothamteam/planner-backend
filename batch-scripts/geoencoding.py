@@ -1,19 +1,26 @@
 import sys
 import time
 import requests
-from bs4 import BeautifulSoup
 import argparse
 import signal
+
+from bs4 import BeautifulSoup
+from collections import Counter
+
+EXCEPT_MAXIMUM = 20
 
 BING_MAPS_KEY = 'Ahy8gRlSXY-6ByIWtjmeL6wXWYO6m8WIYazn2J-n33r8lNgaQ-kABeQisHzAyFwm'
 BING_MAPS_NY_URL = 'http://dev.virtualearth.net/REST/v1/Locations/US/NY/%d//%s?o=xml&key=' + BING_MAPS_KEY
 GOOGLE_MAPS_URL = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false'
 
+
 def handler(signum, frame):
     raise Exception("Time out")
 
+
 class OverLimitException(Exception):
     pass
+
 
 def geo_encoding_bing(address, zipcode):
     url = BING_MAPS_NY_URL % (zipcode, address)
@@ -52,6 +59,7 @@ def geo_encoding_google(address, zipcode, proxy):
 def run_geo_encoding_job(args):
     input_file = args.input
     output_file = args.output
+    except_file = input_file + ".more"
     proxy_file = args.proxy
     start = args.start
 
@@ -61,15 +69,19 @@ def run_geo_encoding_job(args):
             proxies = [{'https': line.strip()} for line in fin.readlines()]
 
     count = 0
-    fout = open(output_file, 'w')
+    except_counter = [0] * len(proxies)
+    fexcept = open(except_file, 'w')
+    fout = open(output_file, 'a')
     with open(input_file, 'r') as fin:
         for line in fin:
+            line = line.strip()
             count += 1
             if count < start:
                 continue
             address, zipcode = line.split(',')
             try:
-                proxy = proxies[count % len(proxies)]
+                idx = count % len(proxies)
+                proxy = proxies[idx]
                 print proxy
                 x, y = geo_encoding_google(address, int(zipcode), proxy)                
                 fout.write("%s: (%f, %f)\n" % (line.strip(), x, y))
@@ -77,12 +89,17 @@ def run_geo_encoding_job(args):
                     print "%d addresses have been processed" % count
             except OverLimitException as e:
                 print '%s over limit' % proxy
-                del proxies[count % len(proxies)]
+                del proxies[idx]
+                del except_counter[idx]
                 if len(proxies) == 0:
                     break
             except Exception as e:
-                print proxy
+                except_counter[idx] += 1
+                fexcept.write(line + '\n') 
                 print "%s: %s" % (line, e.args[0])
+                if except_counter[idx] > EXCEPT_MAXIMUM:
+                    del proxies[idx]
+                    del except_counter[idx]
     print count
     fout.close()
 
