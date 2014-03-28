@@ -109,15 +109,43 @@ def run_geo_encoding_job(args):
     fout.close()
 
 
+def check_output(args):
+    address_file = args.input
+    location_file = args.output
+    address_miss = address_file + '.miss'
+    output_file = location_file + '.clean'
+    s = set()
+    with open(location_file, 'r') as floc:
+        fout_clean = open(output_file, 'w')
+        for line in floc:
+            addr, loc = line.split(':')
+            addr = addr.strip()
+            if addr not in s:
+                s.add(addr)
+                fout_clean.write(line)
+        fout_clean.close()
+    with open(address_file, 'r') as fadd:
+        fadd_miss = open(address_miss, 'w')
+        for line in fadd:
+            if line.strip() not in s:
+                fadd_miss.write(line)
+        fadd_miss.close()
+                
+            
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=str, required=True)
     parser.add_argument('--output', type=str, required=True)
     parser.add_argument('--proxy', type=str, required=False)
     parser.add_argument('--start', type=int, default=-1)
+    parser.add_argument('--job', type=str, choices=['check', 'run'], required=True)
+
     args = parser.parse_args()
     signal.signal(signal.SIGALRM, handler)
-    run_geo_encoding_job(args)
+    if args.job == 'run':
+        run_geo_encoding_job(args)
+    elif args.job == 'check':
+        check_output(args)
 
 if __name__ == '__main__':
     main()
