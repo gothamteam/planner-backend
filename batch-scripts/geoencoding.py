@@ -69,19 +69,24 @@ def run_geo_encoding_job(args):
             proxies = [{'https': line.strip()} for line in fin.readlines()]
 
     count = 0
-    except_counter = [0] * len(proxies)
+    except_counter = [0] if len(proxies) == 0 else [0] * len(proxies)
     fexcept = open(except_file, 'w')
     fout = open(output_file, 'a')
     with open(input_file, 'r') as fin:
         for line in fin:
             line = line.strip()
             count += 1
+            idx = 0 if len(proxies) == 0 else count % len(proxies)
+
             if count < start:
                 continue
-            address, zipcode = line.split(',')
+            print line
+
+            parts = line.split(',')
+            address = ','.join(parts[:-1])
+            zipcode = parts[-1]
             try:
-                idx = count % len(proxies)
-                proxy = proxies[idx]
+                proxy = None if len(proxies) == 0 else proxies[idx]
                 print proxy
                 x, y = geo_encoding_google(address, int(zipcode), proxy)                
                 fout.write("%s: (%f, %f)\n" % (line.strip(), x, y))
