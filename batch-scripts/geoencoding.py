@@ -39,7 +39,7 @@ def geo_encoding_bing(address, zipcode):
 
 def geo_encoding_google(address, zipcode, proxy):
     url = GOOGLE_MAPS_URL % ('+'.join(address.split()) + 'NY,+' + str(zipcode))
-    signal.alarm(10)
+    signal.alarm(6)
     r = requests.get(url, proxies = proxy, timeout = 10)
     signal.alarm(0)
     if r.ok:
@@ -101,6 +101,7 @@ def run_geo_encoding_job(args):
                     del proxies[idx]
                     del except_counter[idx]
     print count
+    fexcept.close()
     fout.close()
 
 
@@ -116,3 +117,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
