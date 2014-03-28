@@ -80,7 +80,6 @@ def run_geo_encoding_job(args):
 
             if count < start:
                 continue
-            print line
 
             parts = line.split(',')
             address = ','.join(parts[:-1])
