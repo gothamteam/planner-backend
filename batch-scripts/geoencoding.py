@@ -1,11 +1,8 @@
-import sys
-import time
-import requests
 import argparse
 import signal
-
+import requests
 from bs4 import BeautifulSoup
-from collections import Counter
+
 
 EXCEPT_MAXIMUM = 20
 
@@ -14,7 +11,7 @@ BING_MAPS_NY_URL = 'http://dev.virtualearth.net/REST/v1/Locations/US/NY/%d//%s?o
 GOOGLE_MAPS_URL = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false'
 
 
-def handler(signum, frame):
+def handler():
     raise Exception("Time out")
 
 
@@ -40,7 +37,7 @@ def geo_encoding_bing(address, zipcode):
 def geo_encoding_google(address, zipcode, proxy):
     url = GOOGLE_MAPS_URL % ('+'.join(address.split()) + 'NY,+' + str(zipcode))
     signal.alarm(6)
-    r = requests.get(url, proxies = proxy, timeout = 10)
+    r = requests.get(url, proxies=proxy, timeout=10)
     signal.alarm(0)
     if r.ok:
         json_data = r.json()
@@ -63,20 +60,20 @@ def run_geo_encoding_job(args):
     proxy_file = args.proxy
     start = args.start
 
-    proxies = []
+    proxies = [None]
     if proxy_file is not None:
         with open(proxy_file) as fin:
             proxies = [{'https': line.strip()} for line in fin.readlines()]
 
     count = 0
-    except_counter = [0] if len(proxies) == 0 else [0] * len(proxies)
+    except_counter = [0] * len(proxies)
     fexcept = open(except_file, 'w')
     fout = open(output_file, 'a')
     with open(input_file, 'r') as fin:
-        for line in fin:
-            line = line.strip()
+        lines = (line.strip() for line in fin)
+        for line in lines:
             count += 1
-            idx = 0 if len(proxies) == 0 else count % len(proxies)
+            idx = count % len(proxies)
 
             if count < start:
                 continue
@@ -85,18 +82,15 @@ def run_geo_encoding_job(args):
             address = ','.join(parts[:-1])
             zipcode = parts[-1]
             try:
-                proxy = None if len(proxies) == 0 else proxies[idx]
-                print proxy
-                x, y = geo_encoding_google(address, int(zipcode), proxy)                
+                proxy = proxies[idx]
+                x, y = geo_encoding_google(address, int(zipcode), proxy)
                 fout.write("%s: (%f, %f)\n" % (line.strip(), x, y))
                 if count % 10 == 0:
                     print "%d addresses have been processed" % count
-            except OverLimitException as e:
-                print '%s over limit' % proxy
+            except OverLimitException:
+                print '%s request over limit exception' % proxy
                 del proxies[idx]
                 del except_counter[idx]
-                if len(proxies) == 0:
-                    break
             except Exception as e:
                 except_counter[idx] += 1
                 fexcept.write(line + '\n') 
@@ -104,6 +98,9 @@ def run_geo_encoding_job(args):
                 if except_counter[idx] > EXCEPT_MAXIMUM:
                     del proxies[idx]
                     del except_counter[idx]
+            finally:
+                if len(proxies) == 0:
+                    break
     print count
     fexcept.close()
     fout.close()
