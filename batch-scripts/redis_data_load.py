@@ -1,11 +1,12 @@
 from ast import literal_eval as make_tuple
+import math
 import argparse
 import json
 import redis
 
 
 def cleanup_str(s):
-    return " ".join(s.split())
+    return ' '.join(s.split())
 
 
 def parse_restaurant_info(line):
@@ -97,6 +98,21 @@ def print_unique_addresses(args):
             if signature not in uniq_set:
                 uniq_set.add(signature)
                 print info['addr'] + ', ' + info['zipcode']
+
+
+def compute_geo_distance(origin, destination):
+    lat1, lon1 = origin
+    lat2, lon2 = destination
+    radius = 6371.0  # km
+
+    dlat = math.radians(lat2-lat1)
+    dlon = math.radians(lon2-lon1)
+
+    a = math.sin(dlat/2) * math.sin(dlat/2) \
+        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = radius * c
+    return d
 
 
 def main():
