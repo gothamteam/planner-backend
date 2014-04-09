@@ -1,1 +1,3 @@
 server/.metadata
+server/.metadata/*
+*.pyc
