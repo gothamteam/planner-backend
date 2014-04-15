@@ -70,7 +70,7 @@ def index_restaurant_data(args):
         for linum, line in enumerate(f):
             try:
                 count += 1
-                rest = json.loads(line,'ISO-8859-1')
+                rest = json.loads(line, 'ISO-8859-1')
                 lat, lon = rest['location']
                 h = hash_location(lat, lon)
                 key = 'geobox:%s:restaurant' % h
