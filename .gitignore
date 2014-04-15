@@ -2,3 +2,4 @@ server/.metadata
 server/.metadata/*
 *.pyc
 .idea
+*.iml
