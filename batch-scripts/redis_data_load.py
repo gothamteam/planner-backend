@@ -1,8 +1,12 @@
 from ast import literal_eval as make_tuple
-import math
 import argparse
+import geohash
 import json
 import redis
+import math
+
+
+DEFAULT_PRECISION = 6
 
 
 def cleanup_str(s):
@@ -50,6 +54,26 @@ def import_restaurant_data(args):
             if signature not in uniq_set:
                 uniq_set.add(signature)
                 pipe.hset(key, info['name'], json_obj)
+            if count % 1000 == 0:
+                pipe.execute()
+                print '%d items has been inserted' % count
+
+
+def index_restaurant_data(args):
+    datafile = args.data
+    host = args.host
+    port = args.port
+
+    pipe = redis.StrictRedis(host=host, port=port).pipeline()
+    with open(datafile, 'r') as f:
+        count = 0
+        for line in f:
+            count += 1
+            rest = json.loads(line)
+            lat, lon = rest['location']
+            h = hash_location(lat, lon)
+            key = 'geobox:%s:restaurant' % h
+            pipe.zadd(key, geohash.encode_uint64(lat, lon), rest)
             if count % 1000 == 0:
                 pipe.execute()
                 print '%d items has been inserted' % count
@@ -115,9 +139,13 @@ def compute_geo_distance(origin, destination):
     return d
 
 
+def hash_location(lat, lon, precision=DEFAULT_PRECISION):
+    return geohash.encode(lat, lon, precision)
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--run', type=str, choices=['import', 'print', 'generate'], required=True)
+    parser.add_argument('--run', type=str, choices=['import', 'print', 'generate', 'index'], required=True)
     parser.add_argument('--data', type=str, required=True)
     parser.add_argument('--locations', type=str, default='locations')
     parser.add_argument('--host', type=str, default='127.0.0.1')
@@ -130,6 +158,8 @@ def main():
         print_unique_addresses(args)
     elif args.run == 'generate':
         generate_data_set(args)
+    elif args.run == 'index':
+        index_restaurant_data(args)
 
 
 if __name__ == '__main__':
