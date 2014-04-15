@@ -1,8 +1,4 @@
-'''
-Created on Mar 22, 2014
+#!/usr/bin/python
+from qtimeapp import app
 
-@author: chhe
-'''
-#!flask/bin/python
-from server.qtimeapp import app
-app.run(debug = True,host= '0.0.0.0')
+app.run(debug=True, host='0.0.0.0')

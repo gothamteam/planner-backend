@@ -6,9 +6,9 @@ from qtimeapp import app
 
 
 @app.route("/restaurant/random")
-def clouds():
+def random_block():
     key = app.redis.randomkey()
-    data = app.redis.hgetall(key)
-    new_data = [json.loads(val) for key, val in data.iteritems()]
-    resp = Response(json.dumps(new_data), status=200, mimetype='application/json')
+    data = app.redis.zrange(key, 0, -1, withscores=True)
+    restaurants = [json.loads(item) for item, _ in data]
+    resp = Response(json.dumps(restaurants), status=200, mimetype='application/json')
     return resp
