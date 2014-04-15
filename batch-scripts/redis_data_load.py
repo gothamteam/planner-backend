@@ -67,16 +67,20 @@ def index_restaurant_data(args):
     pipe = redis.StrictRedis(host=host, port=port).pipeline()
     with open(datafile, 'r') as f:
         count = 0
-        for line in f:
-            count += 1
-            rest = json.loads(line)
-            lat, lon = rest['location']
-            h = hash_location(lat, lon)
-            key = 'geobox:%s:restaurant' % h
-            pipe.zadd(key, geohash.encode_uint64(lat, lon), rest)
-            if count % 1000 == 0:
-                pipe.execute()
-                print '%d items has been inserted' % count
+        for linum, line in enumerate(f):
+            try:
+                count += 1
+                rest = json.loads(line,'ISO-8859-1')
+                lat, lon = rest['location']
+                h = hash_location(lat, lon)
+                key = 'geobox:%s:restaurant' % h
+                pipe.zadd(key, geohash.encode_uint64(lat, lon), line.strip())
+                if count % 1000 == 0:
+                    pipe.execute()
+                    print '%d items has been inserted' % count
+            except Exception as e:
+                print str(linum) + ' ' + line
+                raise e
 
 
 def generate_data_set(args):
