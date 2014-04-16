@@ -1,5 +1,3 @@
-import os
-
 import redis
 from flask import Flask
 
