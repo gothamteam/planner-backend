@@ -40,7 +40,7 @@
     			myLatlng = e.latLng;
     			map.panTo(myLatlng);
     			$.ajax({   
-    			    url:'http://107.170.115.138:5000/diag/map/restaurant/40.666874/-73.988686/diag/map/restaurant/'+e.latLng.lat()+'/'+e.latLng.lng()+'/json', 
+    			    url:'http://107.170.115.138:5000/diag/map/restaurant/'+e.latLng.lat()+'/'+e.latLng.lng()+'/json', 
     			    type:'get',
     			    async : false, //默认为true 异步   
     			    error:function(){   
