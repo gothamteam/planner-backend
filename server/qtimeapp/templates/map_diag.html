@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas {  
+		height: 100% }
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBI4xqycVazXujMCH4B3SWZbrzSrFHr5pg&sensor=true">
+    </script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  </head>
+  <body>
+    <div id="map-canvas"/></div>
+    <script type="text/javascript">
+    
+    var decodeHtmlEntity = function(str) {
+    	  return str.replace(/&#(\d+);/g, function(match, dec) {
+    	    return String.fromCharCode(dec);
+    	  });
+    	};
+    	
+      var myLatlng = new google.maps.LatLng({{Lat}},{{Lng}});
+      var markers = Array();
+      
+      $(document).ready(function () {
+    	    var map;
+    	    var elevator;
+         	 var mapOptions = {
+              center: myLatlng,
+              zoom: 15
+            };
+         	map = new google.maps.Map($('#map-canvas')[0], mapOptions);
+         	setMarkers(map,'{{restaurant}}',myLatlng);
+	
+    	    google.maps.event.addListener(map,'click', function(e) {
+    			myLatlng = e.latLng;
+    			map.panTo(myLatlng);
+    			$.ajax({   
+    			    url:'http://localhost:5000/diag/map/restaurant/'+e.latLng.lat()+'/'+e.latLng.lng()+'/json', 
+    			    type:'get',
+    			    async : false, //默认为true 异步   
+    			    error:function(){   
+    			       alert('error');   
+    			    },   
+    			    success:function(data){  
+    			       clearAllMarkers();
+    			       setMarkers(map,data,myLatlng);
+    			       //alert(data);
+    			    }
+    			});
+    	    	
+    	      });
+    	}); 
+      
+   		// Sets the map on all markers in the array.
+     	function setAllMap(map)
+   		{
+       	   for (var i = 0; i < markers.length; i++)
+       	   {
+      	    	markers[i].setMap(map);
+      	   }
+      	}
+      	
+      	function clearAllMarkers()
+      	{
+      		setAllMap(null);
+      		markers=Array();
+      	}
+      
+		function setMarkers(map,data,myLatlng)
+		{
+	    	   
+	    	   var restaurants = JSON.parse(decodeHtmlEntity(data));
+	     	   var blackMarker=new google.maps.Marker({
+	               position: myLatlng,
+	               map: map,
+	               icon:"{{ url_for('static', filename = 'images/icon_star.png') }}"
+	           }); 
+	     	   
+	     	  	markers.push(blackMarker);
+	            for(var i=0;i<restaurants.length;i++)
+	            {
+	               var restaurant = restaurants[i];
+		           var marker = new google.maps.Marker({
+		                position: new google.maps.LatLng(restaurant['location'][0],restaurant['location'][1]),
+		                map: map,
+		                title:restaurant['name']
+		            });
+		           markers.push(marker);
+	            }
+		}
+		
+ 
+
+
+
+
+
+      
+      
+      
+    </script>
+  </body>
+</html>
