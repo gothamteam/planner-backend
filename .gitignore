@@ -3,3 +3,6 @@ server/.metadata/*
 *.pyc
 .idea
 *.iml
+.settings
+.project
+.pydevproject
