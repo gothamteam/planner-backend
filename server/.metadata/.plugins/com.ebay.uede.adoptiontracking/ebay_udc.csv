@@ -1,4 +1,0 @@
-"KIND","WHAT","DESCRIPTION","BUNDLE_ID","BUNDLE_VERSION","WHEN","DURATION","SIZE","QUANTITY","EXCEPTION","PROPERTIES"
-"ide","startIde","[IDE] RIDE-3.0.1","Unknown",,"1395518622862","0","0","0",,""
-"buildconfig","buildconfig","[build configuration]","com.ebay.tools.tracking.ride",,"1395518625357","0","0","0",,"$$ide_name=RIDE$$ide_version=3.0.1$$config_id=126504849"
-"buildevent","updateMavenIndex","[Updating indexes]","com.ebay.tools.tracking.ride",,"1395518625357","1","0","0",,"$$status=Status OK: unknown code=0 OK null$$config_id=126504849"
