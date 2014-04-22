@@ -13,12 +13,17 @@ key value contains subkeys like:
 "sex":"M"
 "nickName":"ss",
 "id":"111"
-username and id are saved in hash "user:"
-the id increment is "user:id"
+
+
+username and id are saved in hash "user:" eg:
+"wangsuse2011" ,"111"
+
+the id increment is "user:id", single string and is incremented by 1 for every new user
+
 lock is saved in "lock:user:"+lower_userName
 
 
-username and password is stored in hash "authentication:user", eg:
+username and password is stored in hash "user:password", eg:
 key: "wangsuse" value:"mypassword"
 key:"yhfy2008" value:"yhfypassword"
 
