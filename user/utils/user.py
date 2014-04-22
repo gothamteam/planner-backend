@@ -133,7 +133,25 @@ def add_friend(conn,username,password,friend_id):
         release_lock(conn, 'lock:user:'+lower_username,lock)
         return False
 
+#remove friend
+def remove_friend(conn,username,password,friend_id):
+    lower_username=username.lower()
+    lock=acquire_lock_with_timeout(conn, 'lock:user:' +lower_username,20)
+    if not lock:
+        return False
 
+    id=conn.hget("user:",lower_username)
+    if not conn.sismember('user:friend:'+id,friend_id):
+        release_lock(conn, 'lock:user:'+lower_username,lock)
+        return False
+    
+    if conn.hget("user:password",lower_username)==password:
+        conn.srem('user:friend:'+id,friend_id)       
+        release_lock(conn, 'lock:user:'+lower_username,lock)
+        return True
+    else:
+        release_lock(conn, 'lock:user:'+lower_username,lock)
+        return False
 #getfriends input: username, output: friends nickname and id
 def get_friends(conn,username):
     lower_username=username.lower()
@@ -144,10 +162,6 @@ def get_friends(conn,username):
     
     resultSet=conn.smembers('user:friend:'+id)
     return resultSet
-    
-    
-#delete friend,
-
 
 
 #acquire lock
@@ -170,8 +184,6 @@ def acquire_lock_with_timeout(
 #release lock
 def release_lock(conn, lockname, identifier):
     pipe=conn.pipeline(True)
-    
-    
     while True:
         try:
             pipe.watch(lockname)
