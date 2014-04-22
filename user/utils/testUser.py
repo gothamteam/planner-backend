@@ -22,6 +22,11 @@ add_friend(conn,"yhfy85","password","14")
 add_friend(conn,"yhfy85","password1","2")
 add_friend(conn,"yhfy85","password1","10")
 add_friend(conn,"yhfy85","password1", "15")
+add_friend(conn,"yhfy85","password1","3")
+add_friend(conn,"yhfy85","password1","4")
+add_friend(conn,"yhfy85","password1", "5")
+remove_friend(conn,"yhfy85","password1", "5")
+
 
 print  get_friends(conn, "yhfy85")
 print  get_friends(conn, "yhfy86")
