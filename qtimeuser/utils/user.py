@@ -15,12 +15,12 @@ def create_user(conn,username,password,firstName,lastName,DOB, email,age,sex,nic
         release_lock(conn, 'lock:user:'+lower_username,lock)
         return False
     
-    id=conn.incr('user:id')
+    qid=conn.incr('user:id')
     pipeline = conn.pipeline(True)
-    pipeline.hset('user:',lower_username,id)
-    pipeline.hmset('user:%s'%id , {
+    pipeline.hset('user:',lower_username,qid)
+    pipeline.hmset('user:%s'%qid , {
         'username':username,
-        'id': id,
+        'id': qid,
         'timeJoined':time.time(),
         'firstName':firstName,
         'lastName':lastName,
@@ -45,12 +45,12 @@ def delete_user(conn, username, password):
     if not conn.hget('user:',lower_username):
         return False
     
-    id=conn.hget("user:",lower_username)
+    qid=conn.hget("user:",lower_username)
     passwordOnfile=conn.hget("user:password",lower_username)
     
-    if(id!=None and passwordOnfile==password):
+    if(qid!=None and passwordOnfile==password):
         pipeline = conn.pipeline(True)
-        pipeline.delete("user:"+id)
+        pipeline.delete("user:"+qid)
         pipeline.hdel("user:",lower_username)
         pipeline.hdel("user:password",lower_username)
         pipeline.execute()
@@ -66,12 +66,12 @@ def update_user(conn,username,password,firstName,lastName,DOB, email,age,sex,nic
     if not lock:
         return False
     
-    id=conn.hget("user:",lower_username)
+    qid=conn.hget("user:",lower_username)
     pipeline = conn.pipeline(True)
-    pipeline.hset('user:',lower_username,id)
-    pipeline.hmset('user:%s'%id , {
+    pipeline.hset('user:',lower_username,qid)
+    pipeline.hmset('user:%s'%qid , {
         'username':username,
-        'id': id,
+        'id': qid,
         'timeJoined':time.time(),
         'firstName':firstName,
         'lastName':lastName,
@@ -92,8 +92,8 @@ def get_user_infor(conn,username):
     if not conn.hget('user:',lower_username):
         return False
     
-    id=conn.hget("user:",lower_username)
-    resultSet=conn.hgetall("user:"+id)
+    qid=conn.hget("user:",lower_username)
+    resultSet=conn.hgetall("user:"+qid)
     return resultSet
     
 #login authentication input:username, password, output: login_successL True/False
@@ -103,29 +103,29 @@ def has_access (conn, username, password):
     if not conn.hget('user:',lower_username):
         return False
     
-    id=conn.hget("user:",lower_username)
+    qid=conn.hget("user:",lower_username)
     passwordOnfile=conn.hget("user:password",lower_username)
     
-    if(id!=None and passwordOnfile==password):
+    if(qid!=None and passwordOnfile==password):
         return True
     else:
         return False
 
 #addfriend
-def add_friend(conn,username,password,friend_id):
+def add_friend(conn,username,password,friend_qid):
     lower_username=username.lower()
     lock=acquire_lock_with_timeout(conn, 'lock:user:' +lower_username,20)
     if not lock:
         return False
 
-    id=conn.hget("user:",lower_username)
-    if conn.sismember('user:friend:'+id,friend_id):
+    qid=conn.hget("user:",lower_username)
+    if conn.sismember('user:friend:'+qid,friend_qid):
         release_lock(conn, 'lock:user:'+lower_username,lock)
         return True
     
     if conn.hget("user:password",lower_username)==password:
         pipeline = conn.pipeline(True)
-        pipeline.sadd('user:friend:'+id,friend_id)
+        pipeline.sadd('user:friend:'+qid,friend_qid)
         pipeline.execute()
         release_lock(conn, 'lock:user:'+lower_username,lock)
         return True
@@ -134,19 +134,19 @@ def add_friend(conn,username,password,friend_id):
         return False
 
 #remove friend
-def remove_friend(conn,username,password,friend_id):
+def remove_friend(conn,username,password,friend_qid):
     lower_username=username.lower()
     lock=acquire_lock_with_timeout(conn, 'lock:user:' +lower_username,20)
     if not lock:
         return False
 
-    id=conn.hget("user:",lower_username)
-    if not conn.sismember('user:friend:'+id,friend_id):
+    qid=conn.hget("user:",lower_username)
+    if not conn.sismember('user:friend:'+qid,friend_qid):
         release_lock(conn, 'lock:user:'+lower_username,lock)
         return False
     
     if conn.hget("user:password",lower_username)==password:
-        conn.srem('user:friend:'+id,friend_id)       
+        conn.srem('user:friend:'+qid,friend_qid)       
         release_lock(conn, 'lock:user:'+lower_username,lock)
         return True
     else:
@@ -156,11 +156,11 @@ def remove_friend(conn,username,password,friend_id):
 def get_friends(conn,username):
     lower_username=username.lower()
 
-    id=conn.hget("user:",lower_username)
-    if id==None:
+    qid=conn.hget("user:",lower_username)
+    if qid==None:
         return False
     
-    resultSet=conn.smembers('user:friend:'+id)
+    resultSet=conn.smembers('user:friend:'+qid)
     return resultSet
 
 
@@ -169,7 +169,6 @@ def acquire_lock_with_timeout(
     conn, lockname, acquire_timeout=10, lock_timeout=10):
     identifier=str(uuid.uuid4())
     lock_timeout = int(math.ceil(lock_timeout))
-    time1=time.time()
     end=time.time() + acquire_timeout
     while time.time() < end:
         if conn.setnx(lockname, identifier):

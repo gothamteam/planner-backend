@@ -1,12 +1,12 @@
 import redis
-from user import *
+from qtimeuser.utils.user import *
 
 conn = redis.StrictRedis(host='localhost', port=6379, db=0)
-create=create_user(conn,"yhfy85","password1","chen","he","08281987", "yhfygmail.com","60","M",'cc')
+create=create_user(conn,"yhfy85","password1","chen","he","08281987", "yhfygmail.com","60","M",'cccc')
 print "create:"+str(create)
 
-id=conn.hget("user:", "yhfy85")
-print "user id is :"+id
+qid=conn.hget("user:", "yhfy85")
+print "user id is :"+qid
 
 print "user details: "+ str(get_user_infor(conn,"yhfy85"))
 update_user(conn,"yhfy85","password1","chen2","he2","082819872", "yhfygmail2.com","602","M2",'cc2')
